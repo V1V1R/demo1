@@ -1,7 +1,6 @@
 package com.dongruan.DTO;
 
 import lombok.Data;
-
 import java.io.Serializable;
 
 @Data
