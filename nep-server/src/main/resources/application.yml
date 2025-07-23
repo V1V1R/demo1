@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${nep.datasource.driver-class-name}
+      url: jdbc:mysql://${nep.datasource.host}:${nep.datasource.port}/${nep.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${nep.datasource.username}
+      password: ${nep.datasource.password}
+
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.dongruan.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      nep:
+        mapper: debug
+        service: info
+        controller: info
+
+nep:
+  jwt:
+
+    #管理员端jwt
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: dongruan
+    # 设置jwt过期时间
+    admin-ttl: 999999999999999999
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+
+    #网格员端jwt
+    grid-member-secret-key: dongruan1
+
+    grid-member-ttl: 999999999999999999
+
+    grid-member-token-name: token1
+
+    #监督员端jwt
+    supervisor-secret-key: dongruan2
+
+    supervisor-ttl: 999999999999999999
+
+    supervisor-token-name: token2
+
+  alioss:
+    access-key-secret: ${nep.alioss.access-key-secret}
+    bucket-name: ${nep.alioss.bucket-name}
+    endpoint: ${nep.alioss.endpoint}
+    access-key-id: ${nep.alioss.access-key-id}
+

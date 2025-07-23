@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dongruan.mapper.AqiFeedbackMapper">
+    <update id="updateAqiFeedbackAssign">
+
+        update aqi_feedback
+        <set>
+            <if test="gmId != null">
+                gm_id = #{gmId},
+            </if>
+            <if test="assignDate != null">
+                assign_date = #{assignDate},
+            </if>
+            <if test="assignTime != null">
+                assign_time = #{assignTime},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+        </set>
+
+        where af_id = #{afId}
+
+    </update>
+    <update id="updateAqiFeedbackState">
+
+        update aqi_feedback
+        <set>
+
+            <if test="state != null">
+                state = #{state},
+            </if>
+        </set>
+
+        where af_id = #{afId}
+
+    </update>
+
+    <select id="listAqiFeedbackPage" resultType="com.dongruan.ENTITY.AqiFeedback">
+        SELECT
+        af.*,
+        gp.province_name AS provinceName,
+        gp.province_abbr AS provinceAbbr
+        FROM aqi_feedback af
+        INNER JOIN grid_province gp ON af.province_id = gp.province_id
+        <where>
+            <!-- 省区域名称模糊查询 -->
+            <if test="provinceName != null and provinceName != ''">
+                gp.province_name LIKE CONCAT('%', #{provinceName}, '%')
+            </if>
+
+            <!-- 扩展：市区域模糊查询 -->
+            <if test="cityName != null and cityName != ''">
+                AND af.city_id IN (
+                SELECT city_id
+                FROM grid_city
+                WHERE city_name LIKE CONCAT('%', #{cityName}, '%')
+                )
+            </if>
+
+            <if test="estimatedGrade != null and estimatedGrade != 0">
+                AND af.estimated_grade = #{estimatedGrade}
+            </if>
+        </where>
+        ORDER BY af.af_date DESC, af.af_time DESC
+    </select>
+
+</mapper>

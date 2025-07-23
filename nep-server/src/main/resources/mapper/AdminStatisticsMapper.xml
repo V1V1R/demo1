@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dongruan.mapper.AdminStatisticsMapper">
+
+    <select id="listAqiFeedbackPage" resultType="com.dongruan.ENTITY.Statistics">
+        SELECT
+        st.*,
+        gp.province_name AS provinceName,
+        gp.province_abbr AS provinceAbbr
+        FROM statistics as st
+        INNER JOIN grid_province gp ON st.province_id = gp.province_id
+        <where>
+            <!-- 省区域名称模糊查询 -->
+            <if test="provinceName != null and provinceName != ''">
+                gp.province_name LIKE CONCAT('%', #{provinceName}, '%')
+            </if>
+
+            <!-- 扩展：市区域模糊查询 -->
+            <if test="cityName != null and cityName != ''">
+                AND st.city_id IN (
+                SELECT city_id
+                FROM grid_city
+                WHERE city_name LIKE CONCAT('%', #{cityName}, '%')
+                )
+            </if>
+
+
+        </where>
+        ORDER BY st.confirm_date DESC, st.confirm_time DESC
+
+    </select>
+
+    <select id="listProvinceItemTotalStatis" resultType="com.dongruan.VO.ProvinceItemTotalStatisVO">
+        SELECT
+            p.province_id,
+            p.province_abbr,
+            p.province_name,
+            COUNT(CASE WHEN s.so2_value > a.so2_max THEN 1 END) AS so2_exceed,
+            COUNT(CASE WHEN s.co_value > a.co_max THEN 1 END) AS co_exceed,
+            COUNT(CASE WHEN s.spm_value > a.spm_max THEN 1 END) AS pm25_exceed,
+            COUNT(CASE WHEN a.chinese_explain IN ('轻度污染','中度污染','重度污染','严重污染') THEN 1 END) AS aqi_exceed
+        FROM grid_province p
+                 INNER JOIN statistics s ON p.province_id = s.province_id
+                 INNER JOIN aqi a ON s.aqi_id = a.aqi_id
+        WHERE s.confirm_date IS NOT NULL
+        GROUP BY p.province_id
+
+    </select>
+
+
+    <select id="listAqiDistributeTotalStatis" resultType="com.dongruan.VO.AqiDistributeTotalStatisVO">
+        SELECT
+            a.aqi_id AS aqiId,
+            a.chinese_explain AS chineseExplain,
+            COUNT(s.id) AS aqiDistribute
+        FROM aqi a
+                 LEFT JOIN statistics s ON a.aqi_id = s.aqi_id
+            AND s.confirm_date IS NOT NULL
+            AND s.confirm_time IS NOT NULL
+        WHERE a.chinese_explain IN ('优', '良', '轻度污染', '中度污染', '重度污染', '严重污染')
+        GROUP BY a.aqi_id, a.chinese_explain
+        ORDER BY
+            CASE a.chinese_explain
+                WHEN '优' THEN 1
+                WHEN '良' THEN 2
+                WHEN '轻度污染' THEN 3
+                WHEN '中度污染' THEN 4
+                WHEN '重度污染' THEN 5
+                WHEN '严重污染' THEN 6
+                END
+    </select>
+
+
+    <select id="listAqiTrendTotalStatis" resultType="com.dongruan.VO.AqiTrendTotalStatisVO">
+        SELECT
+            DATE_FORMAT(s.confirm_date, '%Y-%m') AS date,
+            COUNT(CASE WHEN a.chinese_explain IN ('轻度污染', '中度污染', '重度污染', '严重污染') THEN 1 END) AS aqiExceed
+        FROM statistics s
+                 INNER JOIN aqi a ON s.aqi_id = a.aqi_id
+        WHERE s.confirm_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(s.confirm_date, '%Y-%m')
+        ORDER BY date DESC
+    </select>
+
+</mapper>
