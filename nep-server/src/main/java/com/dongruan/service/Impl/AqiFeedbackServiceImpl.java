@@ -4,6 +4,7 @@ import com.dongruan.DTO.AqiFeedbackAssignDTO;
 import com.dongruan.DTO.AqiFeedbackPageRequestDto;
 import com.dongruan.DTO.StatusUpdateDto;
 import com.dongruan.ENTITY.AqiFeedback;
+import com.dongruan.VO.AqiFeedbackVO;
 import com.dongruan.constant.StatusConstant;
 import com.dongruan.mapper.AqiFeedbackMapper;
 import com.dongruan.result.PageResult;
@@ -34,10 +35,10 @@ public class AqiFeedbackServiceImpl implements AqiFeedbackService {
 
         PageHelper.startPage(aqiFeedbackPageRequestDto.getPage(),aqiFeedbackPageRequestDto.getPageSize());
 
-        Page<AqiFeedback> page = aqiFeedbackMapper.listAqiFeedbackPage(aqiFeedbackPageRequestDto);
+        Page<AqiFeedbackVO> page = aqiFeedbackMapper.listAqiFeedbackPage(aqiFeedbackPageRequestDto);
 
         long total = page.getTotal();
-        List<AqiFeedback> records = page.getResult();
+        List<AqiFeedbackVO> records = page.getResult();
         return new PageResult(total,records);
     }
 

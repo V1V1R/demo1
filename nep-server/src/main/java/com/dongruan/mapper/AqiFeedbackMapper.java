@@ -2,6 +2,7 @@ package com.dongruan.mapper;
 
 import com.dongruan.DTO.AqiFeedbackPageRequestDto;
 import com.dongruan.ENTITY.AqiFeedback;
+import com.dongruan.VO.AqiFeedbackVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -38,7 +39,7 @@ public interface AqiFeedbackMapper {
      * @param aqiFeedbackPageRequestDto
      * @return
      */
-    Page<AqiFeedback> listAqiFeedbackPage(AqiFeedbackPageRequestDto aqiFeedbackPageRequestDto);
+    Page<AqiFeedbackVO> listAqiFeedbackPage(AqiFeedbackPageRequestDto aqiFeedbackPageRequestDto);
 
     /**
      * 根据id查询反馈信息
